@@ -46,7 +46,7 @@ chmod +x /var/www/linux-project-deployment/deploy.sh
 chmod +x /var/www/linux-project-deployment/webhook.sh
 
 # Configurar serviço systemd para deploy
-cat <<EOF | sudo tee /etc/systemd/system/deploy.service
+sudo tee /etc/systemd/system/deploy.service > /dev/null <<EOF
 [Unit]
 Description=Deploy Script
 After=network.target
@@ -66,9 +66,17 @@ sudo systemctl enable deploy.service
 sudo pm2 startup
 sudo pm2 save
 
-# Configurar NGINX
+# Carregar as variáveis de configuração
 source /var/www/linux-project-deployment/config.env
-sudo bash -c "cat > /etc/nginx/sites-available/default" <<EOF
+
+# Verificar se todas as variáveis estão carregadas
+if [ -z "$APP_IP" ] || [ -z "$API_ROUTE" ] || [ -z "$API_PM2_NAME" ] || [ -z "$WEBHOOK_PM2_NAME" ] || [ -z "$API_PORT" ] || [ -z "$WEBHOOK_PORT" ] || [ -z "$PROJECT_TYPE" ] || [ -z "$REPO_URL" ]; then
+    echo "Erro: Uma ou mais variáveis de ambiente não estão definidas em config.env"
+    exit 1
+fi
+
+# Configurar NGINX
+sudo tee /etc/nginx/sites-available/default > /dev/null <<EOF
 server {
     listen 80;
     server_name $APP_IP;
@@ -78,7 +86,7 @@ server {
         proxy_pass http://localhost:$API_PORT;
         proxy_http_version 1.1;
         proxy_set_header Upgrade \$http_upgrade;
-        proxy_set_header Connection 'upgrade';
+        proxy_set_header Connection "upgrade";
         proxy_set_header Host \$host;
         proxy_cache_bypass \$http_upgrade;
     }
@@ -93,19 +101,6 @@ server {
 }
 EOF
 
-# Reiniciar NGINX
-sudo systemctl restart nginx
-
-# Testes do NGINX
-sudo nginx -t
-
-# Reinicializar NGINX
-sudo systemctl restart nginx
-
-# Verificar status do NGINX
-sudo systemctl status nginx.service
-
-# Verificar journals do NGINX
-journalctl -xeu nginx.service
-
+# Verificar a configuração do NGINX e reiniciar o serviço
+sudo nginx -t && sudo systemctl restart nginx
 
