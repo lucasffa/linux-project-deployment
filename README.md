@@ -34,6 +34,7 @@
    API_PORT=3000
    WEBHOOK_PORT=6000
    PROJECT_TYPE=nest  # 'nest' para projetos Nest.js, 'node' para projetos Node.js, 'plain' para projetos sem build (sem typescript)
+   REPO_URL=https://github.com/teu_usuario/teu_repositorio.git  # URL do repositório Git
    ```
 
    - `APP_IP`: O endereço IP do servidor onde a aplicação será executada.
@@ -43,6 +44,7 @@
    - `API_PORT`: A porta em que a API será executada.
    - `WEBHOOK_PORT`: A porta em que o webhook será executado.
    - `PROJECT_TYPE`: O tipo de projeto ('nest' para projetos Nest.js, 'node' para projetos Node.js, 'plain' para projetos sem build).
+   - `REPO_URL`: O link do teu repositório, a parte mais importante.
 
    ### 3. Configurar o `.env`
 

@@ -3,7 +3,9 @@
 # Carregar as variáveis de configuração
 source /var/www/linux-project-deployment/config.env
 
-REPO_DIR="/var/www/deploys/user-auth-nest"
+# Extrair o nome do repositório da URL
+REPO_NAME=\$(basename -s .git \$REPO_URL)
+REPO_DIR="/var/www/deploys/\$REPO_NAME"
 
 # Tornar o script executável
 chmod +x /var/www/linux-project-deployment/deploy.sh
@@ -12,7 +14,7 @@ chmod +x /var/www/linux-project-deployment/deploy.sh
 rm -rf $REPO_DIR
 
 # Clonar o repositório
-git clone https://github.com/lucasffa/user-auth-nest.git $REPO_DIR
+git clone $REPO_URL $REPO_DIR
 
 # Criar o arquivo .env com as variáveis de ambiente
 cp /var/www/linux-project-deployment/.env $REPO_DIR/.env
