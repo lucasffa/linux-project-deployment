@@ -18,7 +18,7 @@
    ### 1. Clonar o Repositório
 
    ```bash
-   git clone https://seu-repositorio.git /var/www/linux-project-deployment
+   git clone https://github.com/lucasffa/linux-project-deployment /var/www/linux-project-deployment
    cd /var/www/linux-project-deployment
    ```
 
@@ -97,6 +97,7 @@
    Execute o script de configuração para instalar dependências e configurar o ambiente:
 
    ```bash
+   cd /var/www/linux-project-deployment
    chmod +x setup.sh
    ./setup.sh
    ```
@@ -106,6 +107,7 @@
    Para realizar o deploy da aplicação, utilize o webhook ou execute o script de deploy manualmente:
 
    ```bash
+   cd /var/www/linux-project-deployment
    chmod +x deploy.sh
    ./deploy.sh
    ```
