@@ -75,6 +75,10 @@
    ## feature toggles
    USE_REDIS=false
    ENABLE_TOKEN_BLACKLISTING=true
+
+   ## vapid web push
+   VAPID_PUBLIC_KEY=...
+   VAPID_PRIVATE_KEY=...
    ```
 
    - `NODE_ENV`: Ambiente de execução (e.g., development, production).
@@ -91,6 +95,7 @@
    - `REDIS_PORT`: Porta do Redis.
    - `USE_REDIS`: Flag para usar Redis (true ou false).
    - `ENABLE_TOKEN_BLACKLISTING`: Flag para habilitar blacklist de tokens (true ou false).
+   - `VAPID_PUBLIC_KEY` & `VAPID_PRIVATE_KEY`: Caso necessário para web pushes
 
    ### 4. Executar o Script de Configuração
 
@@ -121,3 +126,11 @@
    ## Considerações Finais
 
    Este projeto visa simplificar o processo de deploy de aplicações Node.js e Nest.js, fornecendo um fluxo de trabalho automatizado e configurável. Sinta-se à vontade para ajustar os scripts conforme suas necessidades específicas.
+
+
+   ## Stay in touch with me :)
+
+   **Lucas de Almeida**
+
+   - [LinkedIn](https://www.linkedin.com/in/lucasffa)
+   - [GitHub](https://github.com/lucasffa)

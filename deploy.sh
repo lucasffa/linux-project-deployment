@@ -4,8 +4,8 @@
 source /var/www/linux-project-deployment/config.env
 
 # Extrair o nome do repositório da URL
-REPO_NAME=\$(basename -s .git \$REPO_URL)
-REPO_DIR="/var/www/deploys/\$REPO_NAME"
+REPO_NAME=$(basename -s .git $REPO_URL)
+REPO_DIR="/var/www/deploys/$REPO_NAME"
 
 # Tornar o script executável
 chmod +x /var/www/linux-project-deployment/deploy.sh
@@ -15,6 +15,9 @@ rm -rf $REPO_DIR
 
 # Clonar o repositório
 git clone $REPO_URL $REPO_DIR
+
+# Remover qualquer versão antiga do .env
+rm -f $REPO_DIR/.env
 
 # Criar o arquivo .env com as variáveis de ambiente
 cp /var/www/linux-project-deployment/.env $REPO_DIR/.env
@@ -26,7 +29,7 @@ cd $REPO_DIR
 npm install
 
 # Build da aplicação, dependendo do tipo de projeto
-pm2 stop $API_PM2_NAME
+pm2 delete $API_PM2_NAME
 
 if [ "$PROJECT_TYPE" == "nest" ]; then
     npm run build

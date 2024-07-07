@@ -75,8 +75,11 @@ if [ -z "$APP_IP" ] || [ -z "$API_ROUTE" ] || [ -z "$API_PM2_NAME" ] || [ -z "$W
     exit 1
 fi
 
-# Configurar NGINX
-sudo tee /etc/nginx/sites-available/default > /dev/null <<EOF
+# Verificar se nginx.config existe e copiar, caso contrário usar configuração padrão
+if [ -f /var/www/linux-project-deployment/nginx.config ]; then
+    sudo cp /var/www/linux-project-deployment/nginx.config /etc/nginx/sites-available/default
+else
+    sudo tee /etc/nginx/sites-available/default > /dev/null <<EOF
 server {
     listen 80;
     server_name $APP_IP;
@@ -100,6 +103,7 @@ server {
     }
 }
 EOF
+fi
 
 # Verificar a configuração do NGINX e reiniciar o serviço
 sudo nginx -t && sudo systemctl restart nginx
