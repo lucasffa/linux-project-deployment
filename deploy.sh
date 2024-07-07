@@ -1,35 +1,40 @@
 #!/bin/bash
 
-# Carregar as variáveis de configuração
+set -e  # Exit immediately if a command exits with a non-zero status
+set -u  # Treat unset variables as an error
+
+# Load configuration variables
 source /var/www/linux-project-deployment/config.env
 
-# Extrair o nome do repositório da URL
+# Extract repository name from URL
 REPO_NAME=$(basename -s .git $REPO_URL)
 REPO_DIR="/var/www/deploys/$REPO_NAME"
 
-# Tornar o script executável
-chmod +x /var/www/linux-project-deployment/deploy.sh
+# Change to a valid directory
+cd /var/www
 
-# Remover conteúdo antigo
-rm -rf $REPO_DIR
+# Remove old content if it exists
+if [ -d "$REPO_DIR" ]; then
+    rm -rf $REPO_DIR
+fi
 
-# Clonar o repositório
+# Clone the repository
 git clone $REPO_URL $REPO_DIR
 
-# Remover qualquer versão antiga do .env
+# Remove any old .env file
 rm -f $REPO_DIR/.env
 
-# Criar o arquivo .env com as variáveis de ambiente
+# Create the .env file with environment variables
 cp /var/www/linux-project-deployment/.env $REPO_DIR/.env
 
-# Navegar para o diretório do repositório
+# Navigate to the repository directory
 cd $REPO_DIR
 
-# Instalar dependências
+# Install dependencies
 npm install
 
-# Build da aplicação, dependendo do tipo de projeto
-pm2 delete $API_PM2_NAME
+# Build the application, depending on the project type
+pm2 delete $API_PM2_NAME || true
 
 if [ "$PROJECT_TYPE" == "nest" ]; then
     npm run build
@@ -40,13 +45,12 @@ else
     pm2 start $REPO_DIR/app.js --name $API_PM2_NAME
 fi
 
-# Iniciar o webhook com PM2
-pm2 stop $WEBHOOK_PM2_NAME
+# Restart the webhook with PM2
+pm2 stop $WEBHOOK_PM2_NAME || true
 pm2 start /var/www/linux-project-deployment/webhook.sh --name $WEBHOOK_PM2_NAME
 
-# Salvar o estado do PM2
+# Save the PM2 state
 pm2 save
 
-# Reiniciar NGINX
+# Restart NGINX
 systemctl restart nginx
-
