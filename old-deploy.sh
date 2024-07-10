@@ -9,7 +9,6 @@ source /var/www/linux-project-deployment/config.env
 # Extract repository name from URL
 REPO_NAME=$(basename -s .git $REPO_URL)
 REPO_DIR="/var/www/deploys/$REPO_NAME"
-ECOSYSTEM_CONFIG="$REPO_DIR/ecosystem.config.js"
 
 # Change to a valid directory
 cd /var/www
@@ -35,18 +34,16 @@ cd $REPO_DIR
 npm install
 
 # Build the application, depending on the project type
+pm2 delete $API_PM2_NAME || true
+
 if [ "$PROJECT_TYPE" == "nest" ]; then
     npm run build
+    pm2 start $REPO_DIR/dist/main.js --name $API_PM2_NAME
 elif [ "$PROJECT_TYPE" == "node" ]; then
-    npm run build # se necessário, ou remova essa linha se não for aplicável
+    pm2 start $REPO_DIR/src/index.js --name $API_PM2_NAME
 else
-    echo "Unsupported project type: $PROJECT_TYPE"
-    exit 1
+    pm2 start $REPO_DIR/app.js --name $API_PM2_NAME
 fi
-
-# Start or reload the application using PM2 ecosystem file
-pm2 startOrReload $ECOSYSTEM_CONFIG
-pm2 restart WebhookServer
 
 # Restart the webhook with PM2
 pm2 stop $WEBHOOK_PM2_NAME || true
