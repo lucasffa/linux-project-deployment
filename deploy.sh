@@ -46,14 +46,14 @@ fi
 
 # Start or reload the application using PM2 ecosystem file
 pm2 startOrReload $ECOSYSTEM_CONFIG
-pm2 restart WebhookServer
 
-# Restart the webhook with PM2
+# Run webhook.js with PM2
 pm2 stop $WEBHOOK_PM2_NAME || true
-pm2 start /var/www/linux-project-deployment/webhook.sh --name $WEBHOOK_PM2_NAME
+pm2 start /var/www/linux-project-deployment/webhook.js --name $WEBHOOK_PM2_NAME
 
 # Save the PM2 state
 pm2 save
 
 # Restart NGINX
 systemctl restart nginx
+

@@ -4,7 +4,7 @@ source /var/www/linux-project-deployment/config.env
 
 PORT=$WEBHOOK_PORT
 
-node <<EOF
+node <<EOF &
 const http = require('http');
 const exec = require('child_process').exec;
 
