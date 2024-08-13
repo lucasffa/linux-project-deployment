@@ -16,7 +16,7 @@ cd /var/www
 
 # Remove old content if it exists
 if [ -d "$REPO_DIR" ]; then
-    rm -rf $REPO_DIR
+    sudo rm -rf $REPO_DIR
 fi
 
 # Clone the repository
