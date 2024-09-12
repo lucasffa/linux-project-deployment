@@ -70,10 +70,27 @@ sudo pm2 save
 source /var/www/linux-project-deployment/config.env
 
 # Verificar se todas as variáveis estão carregadas
-if [ -z "$APP_IP" ] || [ -z "$API_ROUTE" ] || [ -z "$API_PM2_NAME" ] || [ -z "$WEBHOOK_PM2_NAME" ] || [ -z "$API_PORT" ] || [ -z "$WEBHOOK_PORT" ] || [ -z "$PROJECT_TYPE" ] || [ -z "$REPO_URL" ]; then
+if [ -z "$APP_IP" ] || [ -z "$API_ROUTE" ] || [ -z "$API_PM2_NAME" ] || [ -z "$WEBHOOK_PM2_NAME" ] || [ -z "$API_PORT" ] || [ -z "$WEBHOOK_PORT" ] || [ -z "$PROJECT_TYPE" ] || [ -z "$REPO_URL" ] || [ -z "$REDIS_PASSWORD" ]; then
     echo "Erro: Uma ou mais variáveis de ambiente não estão definidas em config.env"
     exit 1
 fi
+
+# Criar redis.conf com a senha do REDIS_PASSWORD
+sudo tee /etc/redis/redis.conf > /dev/null <<EOF
+bind 127.0.0.1
+port 6379
+requirepass $REDIS_PASSWORD
+loglevel notice
+logfile /var/log/redis/redis-server.log
+save 900 1
+save 300 10
+save 60 10000
+dbfilename dump.rdb
+dir /var/lib/redis
+EOF
+
+# Reiniciar o serviço do Redis para aplicar as configurações
+sudo systemctl restart redis-server
 
 # Verificar se nginx.config existe e copiar, caso contrário usar configuração padrão
 if [ -f /var/www/linux-project-deployment/nginx.config ]; then
