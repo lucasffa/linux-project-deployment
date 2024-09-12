@@ -9,7 +9,7 @@ is_installed() {
 sudo apt update
 
 # Instalar curl, git, nginx, postgresql se não estiverem instalados
-for package in curl git nginx postgresql; do
+for package in curl git nginx postgresql redis-server; do
     if is_installed $package; then
         echo "$package já está instalado"
     else
