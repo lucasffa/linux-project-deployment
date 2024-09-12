@@ -47,9 +47,22 @@ fi
 # Start or reload the application using PM2 ecosystem file
 pm2 startOrReload $ECOSYSTEM_CONFIG
 
-# Run webhook.js with PM2
-pm2 stop $WEBHOOK_PM2_NAME || true
-pm2 start /var/www/linux-project-deployment/webhook.js --name $WEBHOOK_PM2_NAME
+# Check if the WebhookServer is already running
+WEBHOOK_STATUS=$(pm2 status $WEBHOOK_PM2_NAME | grep -o 'online\|errored\|stopped\|stopping\|launching')
+
+if [ "$WEBHOOK_STATUS" == "online" ]; then
+    echo "WebhookServer is already running. No need to restart."
+elif [ "$WEBHOOK_STATUS" == "errored" ] || [ "$WEBHOOK_STATUS" == "stopped" ] || [ "$WEBHOOK_STATUS" == "stopping" ] || [ "$WEBHOOK_STATUS" == "launching" ]; then
+    echo "WebhookServer is not running or in an unstable state. Attempting to restart..."
+    pm2 restart $WEBHOOK_PM2_NAME || {
+        echo "Failed to restart WebhookServer. Deleting and re-executing..."
+        pm2 delete $WEBHOOK_PM2_NAME || true
+        pm2 start /var/www/linux-project-deployment/webhook.js --name $WEBHOOK_PM2_NAME
+    }
+else
+    echo "WebhookServer is not running. Starting a new process..."
+    pm2 start /var/www/linux-project-deployment/webhook.js --name $WEBHOOK_PM2_NAME
+fi
 
 # Save the PM2 state
 pm2 save
